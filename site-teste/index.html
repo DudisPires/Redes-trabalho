@@ -1,1 +1,120 @@
-<h1>Bem-vindo!</h1><p>Veja a imagem abaixo:</p><img src='/image.png' alt="Galao">
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Clube Atlético Mineiro ⚫⚪</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: repeating-linear-gradient(
+                90deg,
+                #000 0px,
+                #000 80px,
+                #fff 80px,
+                #fff 160px
+            );
+            position: relative;
+            min-height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            backdrop-filter: blur(4px);
+            z-index: 0;
+        }
+
+        header, .container, footer {
+            position: relative;
+            z-index: 1;
+            animation: fadeIn 1s ease-out;
+        }
+
+        header {
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.75);
+            padding: 20px 40px;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
+        }
+
+        header h1 {
+            font-size: 3em;
+            letter-spacing: 2px;
+            margin: 0;
+            text-transform: uppercase;
+            color: #ffffff;
+        }
+
+        header h1 span {
+            color: #dddddd;
+        }
+
+        .banner {
+            font-size: 1.2em;
+            margin-top: 10px;
+            color: #f0f0f0;
+            font-style: italic;
+        }
+
+        .container {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .container img {
+            width: 380px;
+            max-width: 90%;
+            border: 5px solid #ffffff;
+            border-radius: 16px;
+            background-color: #000000aa;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.7);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .container img:hover {
+            transform: scale(1.07);
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.4);
+        }
+
+        footer {
+            text-align: center;
+            padding: 10px 20px;
+            font-size: 0.9em;
+            color: #eee;
+            background-color: rgba(0, 0, 0, 0.85);
+            border-top: 1px solid #555;
+            margin-top: 40px;
+            border-radius: 8px;
+            width: fit-content;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1><span>Clube</span> Atlético Mineiro</h1>
+        <p class="banner">"Aqui é Galo! Orgulho de Minas!"</p>
+    </header>
+
+    <div class="container">
+        <img src="/image.png" alt="Escudo do Atlético Mineiro">
+    </div>
+
+    <footer>
+        &copy; 2025 - Site criado para o trabalho de Redes | <strong>Galo Doido ⚽</strong>
+    </footer>
+</body>
+</html>
