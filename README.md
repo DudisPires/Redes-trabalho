@@ -1,4 +1,4 @@
-# 🖥️ Trabalho de Redes — Cliente e Servidor HTTP em C  
+# 🖥️ Trabalho de Redes — Cliente e Servidor HTTP 
 
 ---
 
