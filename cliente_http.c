@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
 
     write(sock, request, strlen(request));
 
-    FILE *output = fopen("imagens/saida_http.jpg", "wb");
+    FILE *output = fopen("arquivos/saida_http.png", "wb");
     if (!output)
         erro("Erro ao criar arquivo");
 
@@ -84,7 +84,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    printf("Arquivo salvo como 'saida_http'\n");
+    printf("Arquivo salvo como 'saida_http.png'\n");
 
     fclose(output);
     close(sock);

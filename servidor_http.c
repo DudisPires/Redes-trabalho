@@ -7,7 +7,7 @@
 #include <sys/stat.h>
 
 #define PORTA 8080
-#define BUFFER_SIZE 4096
+#define BUFFER_SIZE 8192
 
 void erro(const char *msg) {
     perror(msg);
@@ -22,20 +22,20 @@ void envia_arquivo(int client_sock, const char *caminho) {
         return;
     }
 
+    // Cabeçalho básico (melhorar futuramente com Content-Type real)
     char header[128];
     sprintf(header, "HTTP/1.0 200 OK\r\n\r\n");
     write(client_sock, header, strlen(header));
 
     char buffer[BUFFER_SIZE];
     int n;
-    while ((n = fread(buffer, 1, BUFFER_SIZE, f)) > 0) {
+    while ((n = fread(buffer, 1, BUFFER_SIZE, f)) > 0)
         write(client_sock, buffer, n);
-    }
 
     fclose(f);
 }
 
-void lista_diretorio(int client_sock, const char *dir_path) {
+void lista_diretorio(int client_sock, const char *dir_path, const char *url_path) {
     DIR *dir = opendir(dir_path);
     if (!dir) {
         char *erro500 = "HTTP/1.0 500 Internal Server Error\r\n\r\nErro ao abrir diretório\n";
@@ -43,23 +43,45 @@ void lista_diretorio(int client_sock, const char *dir_path) {
         return;
     }
 
-    char resposta[BUFFER_SIZE];
-    strcpy(resposta, "HTTP/1.0 200 OK\r\nContent-Type: text/html\r\n\r\n");
-    strcat(resposta, "<html><body><h2>Arquivos disponíveis:</h2><ul>");
+    // Cabeçalho HTTP
+    char resposta[BUFFER_SIZE * 2];
+    snprintf(resposta, sizeof(resposta),
+        "HTTP/1.0 200 OK\r\nContent-Type: text/html; charset=UTF-8\r\n\r\n"
+        "<!DOCTYPE html><html lang='pt-br'><head>"
+        "<meta charset='UTF-8'>"
+        "<title>Listagem de arquivos</title>"
+        "<style>"
+        "body { background-color: #111; color: #eee; font-family: Arial, sans-serif; text-align: center; }"
+        "h2 { margin-top: 20px; color: #fff; }"
+        "ul { list-style: none; padding: 0; max-width: 500px; margin: 0 auto; }"
+        "li { margin: 10px 0; padding: 10px; background: #222; border-radius: 8px; }"
+        "a { color: #66f; text-decoration: none; font-weight: bold; }"
+        "a:hover { color: #fff; text-decoration: underline; }"
+        "</style></head><body>"
+        "<h2>Arquivos disponíveis em %s</h2><ul>",
+        url_path);
+
+    write(client_sock, resposta, strlen(resposta));
 
     struct dirent *ent;
     while ((ent = readdir(dir)) != NULL) {
-        if (strcmp(ent->d_name, ".") && strcmp(ent->d_name, "..")) {
-            strcat(resposta, "<li><a href=\"");
-            strcat(resposta, ent->d_name);
-            strcat(resposta, "\">");
-            strcat(resposta, ent->d_name);
-            strcat(resposta, "</a></li>");
-        }
-    }
-    strcat(resposta, "</ul></body></html>");
+        if (!strcmp(ent->d_name, ".") || !strcmp(ent->d_name, ".."))
+            continue;
 
-    write(client_sock, resposta, strlen(resposta));
+        char linha[1024];
+        snprintf(linha, sizeof(linha),
+            "<li><a href=\"%s%s%s\">%s</a></li>",
+            url_path,
+            (url_path[strlen(url_path) - 1] == '/') ? "" : "/",
+            ent->d_name,
+            ent->d_name);
+        write(client_sock, linha, strlen(linha));
+    }
+
+    const char *fim =
+        "</ul><p style='margin-top:40px;color:#888;font-size:0.9em;'>Servidor C - Porta 8080</p></body></html>";
+    write(client_sock, fim, strlen(fim));
+
     closedir(dir);
 }
 
@@ -70,7 +92,6 @@ int main(int argc, char *argv[]) {
     }
 
     char *base_dir = argv[1];
-
     int server_sock = socket(AF_INET, SOCK_STREAM, 0);
     if (server_sock < 0)
         erro("Erro ao criar socket");
@@ -120,7 +141,7 @@ int main(int argc, char *argv[]) {
                 if (stat(index_path, &st) == 0)
                     envia_arquivo(client_sock, index_path);
                 else
-                    lista_diretorio(client_sock, arquivo);
+                    lista_diretorio(client_sock, arquivo, caminho);
             } else {
                 envia_arquivo(client_sock, arquivo);
             }
